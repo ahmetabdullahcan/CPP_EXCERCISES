@@ -59,7 +59,15 @@ static bool checkValidInput(const std::string &input) {
 static int convertToInt(const std::string &input) {
     std::string newInput = input;
     if (input.find(".") != std::string::npos)
+    {
+        if (input.length() == 1 && (input[0] > 31 && input[0] < 127)) {
+            if (input[0] >='0' && input[0] <= '9') {
+                return static_cast<int>(input[0] - '0');
+            }
+            return static_cast<int>(input[0]);
+        }
         newInput = input.substr(0, input.find("."));
+    }
     if (newInput.length() == 1 && (newInput[0] > 31 && newInput[0] < 127)) {
         if (newInput[0] >='0' && newInput[0] <= '9') {
             return static_cast<int>(newInput[0] - '0');
@@ -112,7 +120,9 @@ static float convertToFloat(const std::string &input) {
 
     size_t pos = newInput.find('f');
     if (pos != std::string::npos && newInput.length() > 1)
+    {
         newInput = newInput.substr(0, pos);
+    }
     
     if (newInput.length() == 1 && (newInput[0] > 31 && newInput[0] < 127)) {
         if (newInput[0] >= '0' && newInput[0] <= '9') {
@@ -127,7 +137,7 @@ static float convertToFloat(const std::string &input) {
     if (ss.fail() || !ss.eof()) {
         throw std::invalid_argument("Invalid input for float conversion");
     }
-    if (value < -3.402823466e+38f || value > 3.402823466e+38f) {
+    if (value < std::numeric_limits<float>::min() || value > std::numeric_limits<float>::max()) {
         throw std::out_of_range("Value out of range for float conversion");
     }
     return value;
@@ -149,7 +159,7 @@ static double convertToDouble(const std::string &input) {
     if (ss.fail() || !ss.eof()) {
         throw std::invalid_argument("Invalid input for double conversion");
     }
-    if (value < -1.7976931348623157e+308 || value > 1.7976931348623157e+308) {
+    if (value < std::numeric_limits<double>::min() || value > std::numeric_limits<double>::max()) {
         throw std::out_of_range("Value out of range for double conversion");
     }
     return value;
@@ -199,11 +209,10 @@ void ScalarConverter::convert(const char *input) {
         std::cout << "int : impossible" << std::endl;
     }
 
-    // Convert and print float
     try {
         float f = convertToFloat(rawStr);
         std::cout << "float : " << f;
-        if (f == static_cast<int>(f) && rawStr.find('.') == std::string::npos)
+        if (f == static_cast<int>(f))
             std::cout << ".0";
         std::cout << "f" << std::endl;
     } catch (...) {
@@ -213,7 +222,7 @@ void ScalarConverter::convert(const char *input) {
     try {
         double d = convertToDouble(rawStr);
         std::cout << "double : " << d;
-        if (d == static_cast<int>(d) && rawStr.find('.') == std::string::npos)
+        if (d == static_cast<int>(d))
             std::cout << ".0";
         std::cout << std::endl;
     } catch (...) {
