@@ -1,21 +1,19 @@
-SRCS = main.cpp 
+SRCS = main.cpp
+
+NAME = MutantStack
+
+CXX = c++
+
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 OBJS = $(SRCS:.cpp=.o)
 
-NAME = Mutation
-
-COMPAILER = c++
-
-CFLAGS = -Wall -Wextra -Werror -std=c++98
-
-RM = rm -f
-
 all: $(NAME)
 $(NAME): $(OBJS)
-	$(COMPAILER) $(CFLAGS) -o $(NAME) $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
 clean:
-	$(RM) $(OBJS)
+	rm -f $(OBJS)
 fclean: clean
-	$(RM) $(NAME)
+	rm -f $(NAME)
 re: fclean all
 .PHONY: all clean fclean re
