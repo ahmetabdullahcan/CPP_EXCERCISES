@@ -28,7 +28,7 @@ static bool isValidNumber(const std::string &str) {
 
 static int convertToInt(const std::string &str) {
     if (!isValidNumber(str)) {
-        throw std::runtime_error("Error: Invalid number");
+        throw std::runtime_error("Error");
     }
     return (str[0] - '0');
 }
@@ -47,12 +47,12 @@ void RPN::evaluate(const std::string &expression) {
                 _stack.push(convertToInt(token));
             }
             catch (const std::exception &e) {
-                throw std::runtime_error("Error: Invalid number format");
+                throw std::runtime_error("Error");
             }
         }
         else if (isOperator(token)) {
             if (_stack.size() < 2) {
-                throw std::runtime_error("Error: Insufficient operands");
+                throw std::runtime_error("Error");
             }
             
             int rightOperand = _stack.top();
@@ -73,23 +73,23 @@ void RPN::evaluate(const std::string &expression) {
                     break;
                 case '/':
                     if (rightOperand == 0) {
-                        throw std::runtime_error("Error: Division by zero");
+                        throw std::runtime_error("Error");
                     }
                     result = leftOperand / rightOperand;
                     break;
                 default:
-                    throw std::runtime_error("Error: Unknown operator");
+                    throw std::runtime_error("Error");
             }
             
             _stack.push(result);
         }
         else {
-            throw std::runtime_error("Error: Invalid token");
+            throw std::runtime_error("Error");
         }
     }
     
     if (_stack.size() != 1) {
-        throw std::runtime_error("Error: Invalid expression");
+        throw std::runtime_error("Error");
     }
     
     _result = _stack.top();

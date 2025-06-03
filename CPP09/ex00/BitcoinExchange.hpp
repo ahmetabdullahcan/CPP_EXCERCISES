@@ -24,8 +24,6 @@ public:
     void readDataFromInputFile(const std::string &filename);
     void processInputFile();
     void fillDataMap();
-    void fillInputMap();
-    void printExchangeRate(const std::string &date, const std::string &value);
 };
 
 

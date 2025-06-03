@@ -35,7 +35,7 @@ void BitcoinExchange::readDataFromInputFile(const std::string &filename)
 }
 
 static bool checkFirstLine(const std::string &line){
-    return (line == "date | value");
+    return (line != "date | value");
 }
 
 static bool isNotInteger(const std::string &line)
@@ -125,6 +125,7 @@ static bool checkDateExists(const std::string &line)
     if (day > 31 || month > 12 || year > 2022 || year < 2009 || month < 1 || day < 1)
         return (true);
     
+    
     int maxday = 29;
     if (month == 4 || month == 6 || month == 9 || month == 11)
         maxday = 30;
@@ -146,6 +147,18 @@ static bool checkDateExists(const std::string &line)
     return (false);    
 }
 
+static bool checkDateExistsInData(const std::string &date)
+{
+    int year = stringToInt(date.substr(0, 4));
+    int month = stringToInt(date.substr(5, 2));
+    int day = stringToInt(date.substr(8, 2));
+    int dateKey = year * 10000 + month * 100 + day;
+
+    if (dateKey < 20090102 || dateKey > 20220329)
+        return true;
+    return false;
+}
+
 static bool checkValidDate(const std::string &line){
     std::string::size_type pipePos = line.find('|');
     if (pipePos == std::string::npos)
@@ -161,6 +174,10 @@ static bool checkValidDate(const std::string &line){
         return (true);
     }
     if (checkDateExists(date))
+    {
+        return (true);
+    }
+    if (checkDateExistsInData(date))
     {
         return (true);
     }
@@ -235,7 +252,6 @@ void BitcoinExchange::fillDataMap()
     }
     myFile.close();
     
-    // String tarihlerini integer anahtarlara dönüştür
     for (std::map<std::string, float>::iterator it = this->_data.begin(); 
          it != this->_data.end(); ++it)
     {
@@ -303,7 +319,6 @@ void BitcoinExchange::processInputFile()
             continue;
         }
         
-        // Geçerli veri - işle
         std::string::size_type pipePos = temp.find('|');
         std::string date = trim(temp.substr(0, pipePos));
         std::string amountStr = trim(temp.substr(pipePos + 1));
@@ -314,7 +329,6 @@ void BitcoinExchange::processInputFile()
         int day = stringToInt(date.substr(8, 2));
         int dateKey = year * 10000 + month * 100 + day;
         
-        // Tam eşleşme ara
         std::map<int, float>::iterator exactMatch = this->_dateData.find(dateKey);
         if (exactMatch != this->_dateData.end())
         {
@@ -324,7 +338,6 @@ void BitcoinExchange::processInputFile()
         }
         else
         {
-            // En yakın önceki tarihi bul
             std::map<int, float>::iterator it = this->_dateData.lower_bound(dateKey);
             if (it != this->_dateData.begin())
             {
